@@ -96,9 +96,29 @@ public class JavaAlgorithms {
      * При сравнении подстрок, регистр символов *имеет* значение.
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
+     * Трудоемкость - O(firs.length()*second.length())
+     * Ресурсоемкость - O(second.length())
      */
     static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+        int comStr = 0;
+        int[] wordsMas = new int[second.length()];
+        StringBuilder finalString = new StringBuilder();
+        int startP = 0;
+        for(int letterF = 0 ; letterF<firs.length()-1 ; letterF++)// цикл по 1 слову
+            for (int letterS = second.length()-1 ; letterS>=0; letterS-- )//цикл по 2 слову
+                if (firs.charAt(letterF)==second.charAt(letterS)) {
+                    if (letterS == 0){
+                        wordsMas[letterS] = 1;
+                    }else wordsMas[letterS] = wordsMas[letterS - 1] + 1;
+                    if (wordsMas[letterS] > comStr){
+                        comStr = wordsMas[letterS];
+                        startP = letterS;
+                    }
+                }else
+                    wordsMas[letterS] = 0;
+        for (int k = startP + 1 - comStr ;  k <=startP ; k++)
+            finalString.append(second.charAt(k));
+        return finalString.toString();
     }
 
     /**
@@ -110,8 +130,30 @@ public class JavaAlgorithms {
      *
      * Справка: простым считается число, которое делится нацело только на 1 и на себя.
      * Единица простым числом не считается.
+     * Трудоемкость O(n*sqrt(n)
      */
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
-    }
+        if (limit <= 1) return 0;
+        boolean k;
+        int result = 0;
+        for (int i = 2; i <= limit; i++){
+            k = true;
+            if (i == 2){
+                result++;
+                continue;
+                }
+            if (i < 2 || i%2==0)
+                continue;
+            for (int j = 3; j <= (int) (Math.sqrt(i)); j += 2){
+                if (i % j == 0){
+                    k = false;
+                    break;
+                }
+            }
+            if (!k)
+                continue;
+            result++;
+        }
+        return result;
+        }
 }

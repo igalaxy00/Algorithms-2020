@@ -5,11 +5,12 @@ import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+
 // attention: Comparable is supported but Comparator is not
 public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> implements CheckableSortedSet<T> {
 
     private static class Node<T> {
-        final T value;
+        /*final*/ T value;//тест удаляю если надо
         Node<T> left = null;
         Node<T> right = null;
 
@@ -21,7 +22,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     private Node<T> root = null;
 
     private int size = 0;
-
+    ArrayList<Node<T>> nodes = new ArrayList<>(); // моё
     @Override
     public int size() {
         return size;
@@ -85,6 +86,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
             closest.right = newNode;
         }
         size++;
+        nodes.add(newNode);
         return true;
     }
 
@@ -98,11 +100,59 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
      * Спецификация: {@link Set#remove(Object)} (Ctrl+Click по remove)
      *
      * Средняя
+     *
      */
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        T t = (T) o;
+        Node<T> nodeRemove = find(t);
+        if (!contains(o) || t.compareTo(Objects.requireNonNull(find(t)).value) !=0 || nodeRemove==null)
+            return false;
+        Node<T> current2 = null;
+        Node<T> current1 = root;
+        nodes.remove(find(t));
+        while(current1 != null){
+            int compared = nodeRemove.value.compareTo(current1.value);
+            if(compared == 0)
+                break;  //выход из цикла если найден элемент
+            else {
+                current2 = current1;
+                if(compared < 0)
+                    current1 = current1.left;
+                else
+                    current1 = current1.right;
+            }
+        }
+        if(current1 == null)
+            return false;   // если не нашли узел или дерево пусто
+        if(current1.right == null){   // если у узла нет правого потомка
+            if(current2 == null)     // или узел это корень и не имеет правого потомка
+                root = current1.left;
+            else {  //если узел не корень и у него нет правого потомка
+                if(current1 != current2.left)
+                    current2.right = current1.left;
+                else
+                    current2.left = current1.left;
+            }
+        } else {//найден правый птоомок у узла и ищем самый левый узел из правых
+            Node<T> endLeft = current1.right;
+            current2 = null;
+            while(endLeft.left != null) {
+                current2 = endLeft;
+                endLeft = endLeft.left;
+            }
+            if(current2 != null)
+                current2.left = endLeft.right;
+            else
+                current1.right = endLeft.right;
+            current1.value = endLeft.value;
+        }
+        size--;
+        return true;
+
+
+
+
     }
 
     @Nullable
@@ -172,7 +222,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          */
         @Override
         public void remove() {
-            // TODO
+
             throw new NotImplementedError();
         }
     }

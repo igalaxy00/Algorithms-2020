@@ -222,6 +222,12 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         if (node == null) return 0
         return 1 + max(height(node.left), height(node.right))
     }
+    private fun Node<T>?.min(): Node<T>? {
+        var tempNode = this
+        while (tempNode!!.left != null) tempNode = tempNode.left
+        return tempNode
+
+    }
 
     override fun checkInvariant(): Boolean =
         root?.let { checkInvariant(it) } ?: true

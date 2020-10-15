@@ -2,6 +2,14 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -97,9 +105,30 @@ public class JavaTasks {
      * 24.7
      * 99.5
      * 121.3
+     *Трудоемкость -O(n)
+     *Ресурсоемкость -O(n)
      */
-    static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+    static public void sortTemperatures(String inputName, String outputName) throws IOException {
+        var min = 2730;
+        var max = 7731;
+        int[] list = new int[max];
+        try (var fr=new FileReader(inputName)){
+            var reader = new BufferedReader(fr);
+            var line = reader.readLine();
+            while (line != null){
+                var temp = (int)(Double.parseDouble(line)*10+min);
+                line = reader.readLine();
+                list[temp]++;
+            }
+        }
+        try(var fw = new FileWriter(outputName)){
+            for (int i = 0 ; i< list.length;i++){
+                while (list[i]>0){
+                    fw.write((i - min) / 10.0 + System.lineSeparator());
+                    list[i]--;
+                }
+            }
+        }
     }
 
     /**
@@ -130,9 +159,45 @@ public class JavaTasks {
      * 2
      * 2
      * 2
+     *Трудоемкость -O(n)
+     *Ресурсоемкость -O(n)
      */
-    static public void sortSequence(String inputName, String outputName) {
-        throw new NotImplementedError();
+    static public void sortSequence(String inputName, String outputName)throws IOException {
+        Map<Integer, Integer> arrayNumbers = new HashMap<>();
+        int maxCount = 0;
+        int maxNumber=0;
+        ArrayList<String> text = new ArrayList<>();
+        try (var fr=new FileReader(inputName)) {
+            var reader = new BufferedReader(fr);
+            var line = reader.readLine();
+            while (line != null){
+                int lineValue = Integer.parseInt(line);
+                arrayNumbers.putIfAbsent(lineValue,0);
+              //  var smth = arrayNumbers.get(lineValue)+1;
+                arrayNumbers.put(lineValue,arrayNumbers.get(lineValue)+1);
+                //System.out.println("число которое идёт  " + line);
+                if (maxCount == arrayNumbers.get(lineValue) && maxNumber> lineValue)
+                    maxNumber = lineValue;
+                if (arrayNumbers.get(lineValue)>maxCount){
+                    maxCount = arrayNumbers.get(lineValue);
+                    maxNumber = lineValue;
+                    //System.out.println("кол во повторов  "+maxCount);
+                    //System.out.println("само число   "+maxNumber);
+                }
+                text.add(line);
+                line = reader.readLine();
+            }
+        }
+        try(var fw = new FileWriter(outputName)){
+            for (String line : text){
+                if (Integer.parseInt(line) != maxNumber){
+                    fw.write(line+ System.lineSeparator());
+                }
+            }
+            for(int i = 0 ; i< maxCount ; i++){
+                fw.write(maxNumber+ System.lineSeparator());
+            }
+        }
     }
 
     /**
@@ -150,6 +215,6 @@ public class JavaTasks {
      * Результат: second = [1 3 4 9 9 13 15 20 23 28]
      */
     static <T extends Comparable<T>> void mergeArrays(T[] first, T[] second) {
-        throw new NotImplementedError();
+
     }
 }
