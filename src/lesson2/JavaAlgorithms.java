@@ -108,6 +108,7 @@ public class JavaAlgorithms {
             for (int letterS = second.length()-1 ; letterS>=0; letterS-- )//цикл по 2 слову
                 if (firs.charAt(letterF)==second.charAt(letterS)) {
                     if (letterS == 0){
+                        //System.out.println(letterS);
                         wordsMas[letterS] = 1;
                     }else wordsMas[letterS] = wordsMas[letterS - 1] + 1;
                     if (wordsMas[letterS] > comStr){

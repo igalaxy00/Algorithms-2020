@@ -100,7 +100,8 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
      * Спецификация: {@link Set#remove(Object)} (Ctrl+Click по remove)
      *
      * Средняя
-     *
+     *память O(n)
+     *трудоёмкость средняя O(log(n))
      */
     @Override
     public boolean remove(Object o) {
