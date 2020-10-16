@@ -162,7 +162,7 @@ abstract class AbstractBinarySearchTreeTest {
             }
             println("All clear!")
         }
-        val newTree = BinarySearchTree<Int>()
+        val newTree = BinarySearchTree<Int>()//my test
         newTree.addAll(listOf(4, 2, 1, 5, 7))
         newTree.removeAll(listOf(4, 2))
         assertEquals(3, newTree.size)
