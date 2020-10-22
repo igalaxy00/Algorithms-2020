@@ -209,6 +209,12 @@ abstract class AbstractBinarySearchTreeTest {
             }
             println("All clear!")
         }
+        val testTree = BinarySearchTree<Int>()
+        testTree.addAll(listOf(2, 1, 3, 4, 8))
+        testTree.removeAll(listOf(2, 1, 3, 4, 8))
+        assertFailsWith<IllegalStateException> {
+            testTree.iterator().next()
+        }
     }
 
     protected fun doIteratorRemoveTest() {
@@ -275,6 +281,11 @@ abstract class AbstractBinarySearchTreeTest {
                 )
             }
             println("All clear!")
+        }
+        val testTree = BinarySearchTree<Int>()
+        testTree.addAll(listOf(2, 3, 0, 4, 5))
+        assertFailsWith<IllegalStateException> {
+            testTree.iterator().remove()
         }
     }
 
