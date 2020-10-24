@@ -6,7 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Set;
-
+/**
+ * Множество(таблица) с открытой адресацией на 2^bits элементов без возможности роста.
+ */
 public class OpenAddressingSet<T> extends AbstractSet<T> {
 
     private final int bits;
@@ -16,7 +18,9 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     private final Object[] storage;
 
     private int size = 0;
-
+    /**
+     * Индекс в таблице, начиная с которого следует искать данный элемент
+     */
     private int startingIndex(Object element) {
         return element.hashCode() & (0x7FFFFFFF >> (31 - bits));
     }
@@ -95,7 +99,8 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      */
     @Override
     public boolean remove(Object o) {
-        return super.remove(o);
+        // TODO
+        throw new NotImplementedError();
     }
 
     /**

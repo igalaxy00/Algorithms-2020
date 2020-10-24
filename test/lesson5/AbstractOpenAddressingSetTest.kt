@@ -60,7 +60,7 @@ abstract class AbstractOpenAddressingSetTest {
                 )
                 assertTrue(
                     firstInt in openAddressingSet,
-                    "The removal of the element prevented access to the other elements."
+                        "The removal of the element prevented access to the other elements."
                 )
                 assertEquals(
                     expectedSize, openAddressingSet.size,

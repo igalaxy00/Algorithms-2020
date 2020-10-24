@@ -169,10 +169,10 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         Node<T> current;
 
         private BinarySearchTreeIterator() {
-            push(root);
+            pushNode(root);
         }
 
-        public void push(Node<T> node) {
+        public void pushNode(Node<T> node) {
             while (node != null) {
                 queue.push(node);
                 node = node.left;
@@ -216,7 +216,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
             if (queue.isEmpty())
                 throw new IllegalStateException();
             current = queue.pop();
-            push(current.right);
+            pushNode(current.right);
             return current.value;
 
         }
