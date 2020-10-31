@@ -1,7 +1,7 @@
 package lesson4;
 
 import java.util.*;
-import kotlin.NotImplementedError;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,16 +84,58 @@ public class Trie extends AbstractSet<String> implements Set<String> {
 
     /**
      * Итератор для префиксного дерева
-     *
+     * <p>
      * Спецификация: {@link Iterator} (Ctrl+Click по Iterator)
-     *
+     * <p>
      * Сложная
      */
     @NotNull
     @Override
     public Iterator<String> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new TrieIterator();
+    }
+
+    private class TrieIterator implements Iterator<String> {
+        String removeWord = "";
+        private final ArrayDeque<String> queue = new ArrayDeque<>();
+
+        private TrieIterator() {
+            if (root == null) return;
+            wordToPush(root, "");
+        }
+
+        private void wordToPush(Node node, String str) {
+            if (node.children == null) return;
+            for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
+                if (entry.getKey() == (char) 0) {
+                    queue.push(str);
+                }
+                wordToPush(entry.getValue(), str + entry.getKey());
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return queue.peek() != null;
+        }
+
+        // O(1)
+        @Override
+        public String next() {
+            if (!hasNext()) throw new IllegalStateException();
+            removeWord = queue.pop();
+            return removeWord;
+        }
+
+
+        // Трудоемкость: O(logN*N)
+        //Ресурсоемкость: O(logN*N)
+        @Override
+        public void remove() {
+            if (removeWord.equals("")) throw new IllegalStateException();
+            Trie.this.remove(removeWord);
+            removeWord = "";
+        }
     }
 
 }

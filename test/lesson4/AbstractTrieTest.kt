@@ -107,8 +107,15 @@ abstract class AbstractTrieTest {
             assertFailsWith<IllegalStateException>("Something was supposedly returned after the elements ended") {
                 trieIter.next()
             }
+            //my test
+            trieSet.clear()
+            assertFailsWith<IllegalStateException> {
+                trieIter.next()
+            }
+
             println("All clear!")
         }
+
     }
 
     protected fun doIteratorRemoveTest() {
