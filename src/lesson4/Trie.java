@@ -119,7 +119,8 @@ public class Trie extends AbstractSet<String> implements Set<String> {
             return queue.peek() != null;
         }
 
-        // O(1)
+        // Трудоемкость O(1)
+        //Ресурсоемкость - О(1)
         @Override
         public String next() {
             if (!hasNext()) throw new IllegalStateException();

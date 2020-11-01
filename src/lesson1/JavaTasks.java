@@ -107,6 +107,7 @@ public class JavaTasks {
      * 121.3
      * Трудоемкость -O(n)
      * Ресурсоемкость -O(n)
+     * использовал сортировку подсчетом
      */
     static public void sortTemperatures(String inputName, String outputName) throws IOException {
         var min = 2730;
