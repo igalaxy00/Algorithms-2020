@@ -17,7 +17,7 @@ public class JavaAlgorithms {
      * 201
      * 196
      * 190
-     * 198
+     * 198 м
      * 187
      * 194
      * 193
@@ -32,7 +32,7 @@ public class JavaAlgorithms {
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
     static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) {
-        throw new NotImplementedError();
+         throw new NotImplementedError();
     }
 
     /**
