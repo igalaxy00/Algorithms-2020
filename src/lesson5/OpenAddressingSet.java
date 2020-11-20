@@ -1,6 +1,5 @@
 package lesson5;
 
-import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractSet;
@@ -53,6 +52,14 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             index = (index + 1) % capacity;
             current = storage[index];
         }
+        for (Object value : storage) {
+            current = value;
+            if (current != null) {
+                if (current.equals(o)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -95,12 +102,25 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      *
      * Спецификация: {@link Set#remove(Object)} (Ctrl+Click по remove)
      *
+     * Трудоемкость = O(N)
+     *
+     * Ресурсоемкость = O(1)
      * Средняя
      */
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        int i = startingIndex(o);
+        Object cur = storage[i];
+        while (cur != null) {
+            if (cur.equals(o)) {
+                size--;//уменьш размера
+                storage[i] = null;//удаление
+                return true;
+            }
+            i = (i + 1) % capacity;
+            cur = storage[i];//cur след элемент
+        }
+        return false;
     }
 
     /**
@@ -116,7 +136,44 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     @NotNull
     @Override
     public Iterator<T> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new OpenAddressingSetIterator();
+    }
+
+    public class OpenAddressingSetIterator implements Iterator <T>{
+        private int i = 0;
+        Object cur = null;
+        private OpenAddressingSetIterator(){
+            while (i < capacity && storage[i] == null){
+                i += 1;
+            }
+        }
+
+
+        @Override
+        public boolean hasNext() {
+            return i < capacity;
+        }
+
+
+        //Трудоемкость = O(N)
+        //Ресурсоемкость = O(1)
+        @Override
+        public  T next() {
+            if (!hasNext()) throw new IllegalStateException();
+            cur = storage[i];
+            i++;
+            while (i < capacity && storage[i] == null){
+                i += 1;
+            }
+            return (T) cur;
+        }
+
+        //Трудоемкость и ресурсоемкость от  remove
+        @Override
+        public void remove() {
+            if (cur == null) throw new IllegalStateException();
+            OpenAddressingSet.this.remove(cur);
+            cur = null;
+        }
     }
 }

@@ -129,7 +129,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         }
 
 
-        // Трудоемкость: O(logN*N)
+        // Трудоемкость: O(logN)
         //Ресурсоемкость: O(logN*N)
         @Override
         public void remove() {

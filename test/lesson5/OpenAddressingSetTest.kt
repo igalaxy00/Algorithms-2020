@@ -25,6 +25,7 @@ class OpenAddressingSetTest : AbstractOpenAddressingSetTest() {
     @Tag("5")
     fun iteratorTestJava() {
         doIteratorTest()
+        doIteratorRemoveTest()
     }
 
     @Test
