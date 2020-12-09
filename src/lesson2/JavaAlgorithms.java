@@ -86,6 +86,7 @@ public class JavaAlgorithms {
      */
     static public int josephTask(int menNumber, int choiceInterval) {
         throw new NotImplementedError();
+
     }
 
     /**

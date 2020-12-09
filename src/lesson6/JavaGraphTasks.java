@@ -2,8 +2,10 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
@@ -94,9 +96,29 @@ public class JavaGraphTasks {
      * Если на входе граф с циклами, бросить IllegalArgumentException
      *
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
+     *Трудоемкость = O(кол-во вершин * кол-во вершин)
+     *Ресурсоемкость = O(кол-во вершин)
      */
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
-        throw new NotImplementedError();
+        Set<Set<Graph.Vertex>> fSet = new HashSet<>();
+        for (Graph.Vertex vertex : graph.getVertices()){
+            Set<Graph.Vertex> temp = new HashSet<>();
+            Set<Graph.Vertex> wrong = new HashSet<>();
+            for (Graph.Vertex vertex2 : graph.getVertices()){
+                if (!wrong.contains(vertex2) && !graph.getNeighbors(vertex).contains(vertex2) ) {
+                    wrong.addAll(graph.getNeighbors(vertex2));
+                    temp.add(vertex2);
+                }
+            }
+            fSet.add(temp);
+        }
+
+        Set<Graph.Vertex> result = new HashSet<>();
+        for (Set<Graph.Vertex> set : fSet) {
+            if (set.size() > result.size()) {
+                result = set;}
+        }
+        return result;
     }
 
     /**
@@ -118,9 +140,35 @@ public class JavaGraphTasks {
      * J ------------ K
      *
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
+     *
+     *Трудоемкость = O(кол-во вершин!)
+     *Ресурсоемкость = O(кол-во вершин^2)
      */
     public static Path longestSimplePath(Graph graph) {
-        throw new NotImplementedError();
+        Set<Graph.Vertex> vertices = graph.getVertices();
+        Stack<Path> ways = new Stack<>();
+        Path result = new Path();
+        int biggest = 0;
+
+        for (Graph.Vertex vertex: vertices) {
+            ways.push(new Path(vertex));
+        }
+        while(!ways.isEmpty()){
+            Path way = ways.pop();
+
+            if (biggest < way.getLength()){
+                biggest = way.getLength();
+                result = way;
+            }
+            Set<Graph.Vertex> near = graph.getNeighbors(way.getVertices().get(way.getLength()));
+            for (Graph.Vertex neighbour : near){
+                if(!way.contains(neighbour)) {
+                    Path res = new Path(way, graph, neighbour);
+                    ways.push(res);
+                }
+            }
+        }
+        return result;
     }
 
 
