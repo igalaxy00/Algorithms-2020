@@ -2,14 +2,12 @@ package lesson5;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.Set;
-/**
- * Множество(таблица) с открытой адресацией на 2^bits элементов без возможности роста.
- */
-public class OpenAddressingSet<T> extends AbstractSet<T> {
+import java.util.*;
 
+public class OpenAddressingSet<T> extends AbstractSet<T> {
+    private enum Removed{
+        REMOVED
+    }
     private final int bits;
 
     private final int capacity;
@@ -17,9 +15,9 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     private final Object[] storage;
 
     private int size = 0;
-    /**
-     * Индекс в таблице, начиная с которого следует искать данный элемент
-     */
+
+
+
     private int startingIndex(Object element) {
         return element.hashCode() & (0x7FFFFFFF >> (31 - bits));
     }
@@ -52,14 +50,6 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             index = (index + 1) % capacity;
             current = storage[index];
         }
-        for (Object value : storage) {
-            current = value;
-            if (current != null) {
-                if (current.equals(o)) {
-                    return true;
-                }
-            }
-        }
         return false;
     }
 
@@ -78,7 +68,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
         int startingIndex = startingIndex(t);
         int index = startingIndex;
         Object current = storage[index];
-        while (current != null) {
+        while (current != null && current != Removed.REMOVED) {
             if (current.equals(t)) {
                 return false;
             }
@@ -102,23 +92,34 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      *
      * Спецификация: {@link Set#remove(Object)} (Ctrl+Click по remove)
      *
-     * Трудоемкость = O(N)
-     *
-     * Ресурсоемкость = O(1)
      * Средняя
+     * Трудоемкость = O(N) - худший случай
+     * Ресурсоемкость = O(1)
      */
+
+
+
     @Override
     public boolean remove(Object o) {
-        int i = startingIndex(o);
-        Object cur = storage[i];
-        while (cur != null) {
-            if (cur.equals(o)) {
-                size--;//уменьш размера
-                storage[i] = null;//удаление
+
+        int startingIndex = startingIndex(o);
+        int index = startingIndex;
+        Object current = storage[index];
+
+        while (current != null) {
+            if (current.equals(o)) {
+
+                //Удаление элемента
+                storage[index] = Removed.REMOVED;
+                //Уменьшение размера
+                size--;
                 return true;
             }
-            i = (i + 1) % capacity;
-            cur = storage[i];//cur след элемент
+
+            //Следующий элемент становится current
+            index = (index + 1) % capacity;
+            if (index == startingIndex) return false;
+            current = storage[index];
         }
         return false;
     }
@@ -140,40 +141,48 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     }
 
     public class OpenAddressingSetIterator implements Iterator <T>{
-        private int i = 0;
-        Object cur = null;
+
+        private int index = 0;
+        private int prev = -1;
+        Object current = null;
+
         private OpenAddressingSetIterator(){
-            while (i < capacity && storage[i] == null){
-                i += 1;
+            nextIndex();
+        }
+
+        private void nextIndex(){
+            while (index < capacity && (storage[index] == null || storage[index] == Removed.REMOVED)){
+                index ++;
             }
         }
 
-
+        //Трудоемкость Ресурсоемкость = O(1)
         @Override
         public boolean hasNext() {
-            return i < capacity;
+            return index < capacity;
         }
 
 
-        //Трудоемкость = O(N)
+        //Трудоемкость = O(N) в хедшем
         //Ресурсоемкость = O(1)
         @Override
-        public  T next() {
-            if (!hasNext()) throw new IllegalStateException();
-            cur = storage[i];
-            i++;
-            while (i < capacity && storage[i] == null){
-                i += 1;
-            }
-            return (T) cur;
+        public T next() {
+            if (!hasNext())
+                throw new IllegalStateException();
+            prev = index;
+            current = storage[index];
+            index ++;
+            nextIndex();
+            return (T) current;
         }
 
-        //Трудоемкость и ресурсоемкость от  remove
+        //Трудоемкость и Ресурсоемкость = O(1)
         @Override
         public void remove() {
-            if (cur == null) throw new IllegalStateException();
-            OpenAddressingSet.this.remove(cur);
-            cur = null;
+            if (current == null || prev == -1)
+                throw new IllegalStateException();
+            storage[prev] = Removed.REMOVED;
+            size--;
         }
     }
 }

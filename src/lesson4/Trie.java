@@ -1,6 +1,7 @@
 package lesson4;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,11 +13,16 @@ public class Trie extends AbstractSet<String> implements Set<String> {
 
     private static class Node {
         Map<Character, Node> children = new LinkedHashMap<>();
+        Node parent;
+
+        public boolean isEnd() {
+            return this.children.containsKey('\u0000');
+        }
     }
 
     private Node root = new Node();
-
     private int size = 0;
+
 
     @Override
     public int size() {
@@ -28,6 +34,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         root.children.clear();
         size = 0;
     }
+
 
     private String withZero(String initial) {
         return initial + (char) 0;
@@ -43,6 +50,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         return current;
     }
 
+
     @Override
     public boolean contains(Object o) {
         String element = (String) o;
@@ -52,22 +60,23 @@ public class Trie extends AbstractSet<String> implements Set<String> {
     @Override
     public boolean add(String element) {
         Node current = root;
-        boolean modified = false;
+        boolean modif = false;
         for (char character : withZero(element).toCharArray()) {
             Node child = current.children.get(character);
-            if (child != null) {
+            if (child != null)
                 current = child;
-            } else {
-                modified = true;
+            else {
                 Node newChild = new Node();
+                newChild.parent = current;
                 current.children.put(character, newChild);
                 current = newChild;
+                modif = true;
             }
         }
-        if (modified) {
+        if (modif)
             size++;
-        }
-        return modified;
+
+        return modif;
     }
 
     @Override
@@ -82,6 +91,7 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         return false;
     }
 
+
     /**
      * Итератор для префиксного дерева
      * <p>
@@ -95,48 +105,93 @@ public class Trie extends AbstractSet<String> implements Set<String> {
         return new TrieIterator();
     }
 
-    private class TrieIterator implements Iterator<String> {
-        String removeWord = "";
-        private final ArrayDeque<String> queue = new ArrayDeque<>();
+    public class TrieIterator implements Iterator<String> {
+        Set<Node> iter = new HashSet<>();
+        Node cursor = Trie.this.root;
+        String last = "";
+        String collected = last;
+        int count = 0;
 
-        private TrieIterator() {
-            if (root == null) return;
-            wordToPush(root, "");
+        @Override
+        //Трудоемкость Ресурсоемкость O(1)
+        public boolean hasNext() {
+            if (Trie.this.size() == 0)
+                return false;
+            else
+                return count < Trie.this.size();
         }
 
-        private void wordToPush(Node node, String str) {
-            if (node.children == null) return;
-            for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
-                if (entry.getKey() == (char) 0) {
-                    queue.push(str);
+        @Override
+        //Трудоемкость Ресурсоемкость O(N)
+        public String next() {
+            if (!hasNext()) throw new IllegalStateException();
+            while (true) {
+                Set<Character> key = cursor.children
+                        .keySet().stream().filter(o -> !(iter
+                                .contains(cursor.children.get(o))) && o != '\u0000')
+                        .collect(Collectors.toSet());
+                if (key.isEmpty()) {
+                    String delayedReturn = "";
+                    if (cursor.isEnd())
+                        delayedReturn = collected;
+                    for (Character child : cursor.children.keySet())
+                        iter.remove(cursor.children.get(child));
+                    collected = collected.substring(0, collected.length() - 1);
+                    iter.add(cursor);
+                    cursor = cursor.parent;
+                    if (!delayedReturn.isEmpty()) {
+                        count++;
+                        last = delayedReturn;
+                        return delayedReturn;
+                    }
+                } else {
+                    for (Character character : key) {
+                        Node node = cursor.children.get(character);
+                        if (node.isEnd() && node.children.size() == 1) {
+                            count++;
+                            iter.add(node);
+                            last = collected + character;
+                            return collected + character;
+                        }
+                    }
+
+                    Character next = key.stream()
+                            .filter(o -> o != '\u0000')
+                            .collect(Collectors.toSet()).iterator().next();
+                    cursor = cursor.children.get(next);
+                    collected += next;
                 }
-                wordToPush(entry.getValue(), str + entry.getKey());
             }
         }
 
         @Override
-        public boolean hasNext() {
-            return queue.peek() != null;
-        }
-
-        // Трудоемкость O(1)
-        //Ресурсоемкость - О(1)
-        @Override
-        public String next() {
-            if (!hasNext()) throw new IllegalStateException();
-            removeWord = queue.pop();
-            return removeWord;
-        }
-
-
-        // Трудоемкость: O(logN)
-        //Ресурсоемкость: O(logN*N)
-        @Override
+        //Трудоемкость и ресурсоемкость O(N)
         public void remove() {
-            if (removeWord.equals("")) throw new IllegalStateException();
-            Trie.this.remove(removeWord);
-            removeWord = "";
+            if (iter.size() == 0)
+                throw new IllegalStateException();
+            else {
+                Node remCur = cursor;
+                String remin = last.substring(collected.length());
+                String removingState = last;
+                for (int i = 0; i < remin.length(); i++)
+                    if (remCur.children.containsKey(remin.charAt(i)))
+                        remCur = remCur.children.get(remin.charAt(i));
+                    else
+                        throw new IllegalStateException();
+                if (remCur.isEnd()) {
+                    remCur.children.remove('\u0000');
+                    if (remCur.children.size() == 0) {
+                        do {
+                            remCur = remCur.parent;
+                            remCur.children.remove(removingState.charAt(removingState.length() - 1));
+                            removingState = removingState.substring(0, removingState.length() - 1);
+                        } while (remCur.children.size() == 0);
+                    }
+                } else
+                    throw new IllegalStateException();
+                size--;
+                count--;
+            }
         }
     }
-
 }
